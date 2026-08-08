@@ -1,95 +1,115 @@
-# SKALA E2E Data Analysis — NYC Yellow Taxi RatecodeID Prediction
+# NYC Yellow Taxi — RatecodeID Prediction
 
-NYC Yellow Taxi (2026-05) 데이터를 활용한 End-to-End 데이터 분석 및 RatecodeID 예측 ML 프로젝트.
+[![Python](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
+[![scikit-learn](https://img.shields.io/badge/scikit--learn-1.9-orange.svg)](https://scikit-learn.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-## 프로젝트 구조
+End-to-end data analysis and machine learning project predicting NYC Yellow Taxi `RatecodeID` using trip metadata. Built with Pandas, Polars, Seaborn, Plotly, scikit-learn Pipeline.
 
-```
-skala-e2e-data-analysis/
-├── data/                          # 데이터셋 (gitignore)
-│   ├── yellow_tripdata_2026-05.parquet          # 원본
-│   ├── yellow_tripdata_2026-05_clean.parquet    # 정제본
-│   └── yellow_tripdata_2026-05_ml.parquet       # ML용 feature subset
-├── output/
-│   ├── report.md                  # 종합 결과 리포트
-│   ├── model_hgb.joblib           # HistGradientBoosting 모델
-│   ├── model_rf.joblib            # RandomForest 모델
-│   └── figures/                   # 시각화 차트 (PNG + HTML)
-├── src/
-│   ├── explore_distribution.py    # 초기 탐색적 EDA
-│   ├── 2_visualization.py         # RatecodeID 시각화 (Seaborn + Plotly)
-│   └── 4_ml_pipeline.py           # ML Pipeline (전처리 → 학습 → 평가 → 시각화)
-├── DATA_CLEANING_NOTES.md         # 데이터 정제·Feature·통계 분석 문서
-├── ASSIGNMENT.md                  # 과제 명세
-├── PLAN.md                        # 프로젝트 계획
-├── RUBRIC.md                      # 채점 기준
-└── requirements.txt               # (필요 시 추가)
-```
+## Dataset
 
-## 데이터셋
+[NYC Yellow Taxi Trip Data (2026-05)](https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2026-05.parquet)
 
-- [NYC Yellow Taxi 2026-05](https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2026-05.parquet)
-- 원본: 4,090,836행 × 20컬럼
-- 정제 후: 3,021,962행 (결측치 행 제거 + 이상치 필터링)
+| | Original | Cleaned |
+|---|:---:|:---:|
+| Rows | 4,090,836 | 3,021,962 |
+| Columns | 20 | 11 (feature subset) |
+| Target | `RatecodeID` | 6-class |
 
-## 실행 방법
+## Quick Start
 
-### 1. 환경 설정
+```bash
+git clone https://github.com/P4NTENG/skala-e2e-data-analysis.git
+cd skala-e2e-data-analysis
 
-```powershell
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+source .venv/bin/activate   # or .venv\Scripts\Activate.ps1
+
 pip install -r requirements.txt
-```
 
-### 2. 데이터 다운로드
+# Download dataset into data/
+# https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2026-05.parquet
 
-```powershell
-# data/ 디렉토리에 yellow_tripdata_2026-05.parquet 다운로드
-```
-
-### 3. 시각화 실행
-
-```powershell
-python src/2_visualization.py
-```
-
-RatecodeID 분포, trip_distance/승객/시간대별 분석, 상관계수, η², t-test 요약 등 16개 차트를 `output/figures/`에 생성.
-
-### 4. ML 파이프라인 실행
-
-```powershell
 python src/4_ml_pipeline.py
 ```
 
-RandomForest + HistGradientBoosting 모델 학습, 5-fold CV 평가, classification report 출력, 모델 저장, 12개 결과 시각화 생성.
+## Usage
 
-## 모델 성능
+| Script | Description |
+|--------|-------------|
+| `src/2_visualization.py` | EDA + statistical analysis charts (Seaborn / Plotly) |
+| `src/4_ml_pipeline.py` | ML pipeline: preprocessing → training → evaluation → visualization |
 
-| 지표 | RandomForest | HistGradientBoosting |
-|------|:---:|:---:|
-| CV Balanced Accuracy | 0.7487 | **0.8207** |
-| Test Balanced Accuracy | 0.7522 | **0.8293** |
-| Test Weighted F1 | 0.8042 | **0.9090** |
+## Project Structure
 
-### 클래스별 F1 (HGB)
+```
+├── data/                    # Dataset (gitignored)
+├── output/
+│   ├── report.md            # Full results report
+│   ├── model_hgb.joblib     # HistGradientBoosting model
+│   ├── model_rf.joblib      # RandomForest model
+│   └── figures/             # Charts (PNG + interactive HTML)
+├── src/
+│   ├── explore_distribution.py
+│   ├── 2_visualization.py
+│   └── 4_ml_pipeline.py
+├── requirements.txt
+└── README.md
+```
+
+## Features
+
+| Feature | Type | Description |
+|---------|------|-------------|
+| `PULocationID` | categorical (265) | Pickup location |
+| `DOLocationID` | categorical (265) | Dropoff location |
+| `VendorID` | binary | Taxi vendor |
+| `payment_type` | categorical | Payment method |
+| `passenger_count` | numeric | Number of passengers |
+| `store_and_fwd_flag` | binary | Trip stored in vehicle memory |
+| `hour` | numeric | Pickup hour (0-23) |
+| `day_of_week` | numeric | Day of week (0-6) |
+| `is_weekend` | binary | Weekend flag |
+
+## Models
+
+Two classifiers with `sklearn.pipeline.Pipeline`:
+
+| Model | CV Balanced Accuracy | Test Weighted F1 |
+|--------|:---:|:---:|
+| RandomForest | 0.7487 | 0.8042 |
+| **HistGradientBoosting** | **0.8207** | **0.9090** |
+
+### Per-Class F1 (HistGradientBoosting)
 
 | Standard | JFK | Unknown | Nassau | Negotiated | Newark |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | 0.93 | 0.80 | 0.73 | 0.63 | 0.19 | 0.11 |
 
-## Feature Importance
+## Key Findings
 
-| 순위 | Feature | 중요도 |
-|:---:|---------|:---:|
-| 1 | DOLocationID | 0.431 |
-| 2 | PULocationID | 0.211 |
-| 3 | VendorID | 0.249 |
-| 4 | passenger_count | 0.037 |
-| 5 | hour | 0.031 |
+- Geographic features (`DOLocationID` + `PULocationID`) account for **64%** of feature importance
+- `RatecodeID=99` (Unknown) is perfectly characterized by `VendorID=1 ∩ payment_type=1 ∩ passenger_count=1`
+- All features show statistically significant differences across rate codes (p < 0.001, Welch's t-test)
+- Minority classes (Newark 0.4%, Negotiated 0.7%) suffer from data scarcity
 
-## 결과 확인
+## Documentation
 
-- **`output/report.md`** — 전체 결과 리포트 (이미지 포함)
-- **`DATA_CLEANING_NOTES.md`** — 데이터 정제·Feature·통계 분석 상세
-- **`output/figures/`** — 모든 시각화 차트
+- [`output/report.md`](output/report.md) — Full results with embedded charts
+- [`DATA_CLEANING_NOTES.md`](DATA_CLEANING_NOTES.md) — Data cleaning, feature analysis, statistical tests
+
+## Dependencies
+
+```
+pandas >= 3.0
+polars >= 1.0
+numpy >= 2.0
+seaborn >= 0.13
+matplotlib >= 3.7
+plotly >= 5.15
+scipy >= 1.10
+scikit-learn >= 1.3
+joblib >= 1.3
+pyarrow >= 12.0
+kaleido >= 0.2
+```
