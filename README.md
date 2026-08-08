@@ -39,7 +39,7 @@ skala-e2e-data-analysis/
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-pip install pandas polars numpy seaborn matplotlib plotly scipy scikit-learn joblib pyarrow kaleido
+pip install -r requirements.txt
 ```
 
 ### 2. 데이터 다운로드
