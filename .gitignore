@@ -1,0 +1,14 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Data files (downloaded separately)
+data/*.parquet
+
+# IDE
+.vscode/
+.idea/
