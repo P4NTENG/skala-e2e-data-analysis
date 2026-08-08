@@ -11,6 +11,7 @@ data/*.parquet
 
 # Skills
 .agents/
+.claude/
 
 # IDE
 .vscode/
