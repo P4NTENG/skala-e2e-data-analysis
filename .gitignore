@@ -9,6 +9,9 @@ __pycache__/
 # Data files (downloaded separately)
 data/*.parquet
 
+# Skills
+.agents/
+
 # IDE
 .vscode/
 .idea/
